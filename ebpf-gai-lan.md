@@ -8,7 +8,7 @@ description: 用好一项技能的前提是充分了解它
 
 ebpf是事件驱动型程序，下图是编译、加载、校验的架构。
 
-<figure><img src=".gitbook/assets/image (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/image (2) (1).png" alt=""><figcaption></figcaption></figure>
 
 1. 使用高级语言如c编写代码
 2. 经clang编译成bpf字节码，bpf字节码和maps相互配合，maps是bpf程序所用的内存（可简单理解为堆，后面再做详细探讨）。
@@ -19,7 +19,7 @@ ebpf是事件驱动型程序，下图是编译、加载、校验的架构。
 
 ## ebpf应用场景一览
 
-<figure><img src=".gitbook/assets/image (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/image (3) (1).png" alt=""><figcaption></figcaption></figure>
 
 verify
 
