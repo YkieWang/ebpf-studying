@@ -59,9 +59,68 @@ sudo tc filter add dev eth0 ingress bpf da obj tc-example.o sec ingress
 sudo tc filter add dev eth0 egress bpf da obj tc-example.o sec egress
 ```
 
-#### 套接字（该截胡的时候就截胡）
+#### 套接字socket（该截胡的时候就截胡）
 
-**过滤、观测或重定向套接字网络包**
+过滤、观测或重定向套接字网络包。socket程序有好几个种类，下面列出来了socket发展历程的一个feather：
+
+| BPF attached to sockets                      | 3.19 | [`89aa075832b0`](https://github.com/torvalds/linux/commit/89aa075832b0da4402acebd698d0411dcc82d03e)                                  |
+| -------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Non-root programs on sockets                 | 4.4  | [`1be7f75d1668`](https://github.com/torvalds/linux/commit/1be7f75d1668d6296b80bf35dcf6762393530afc)                                  |
+| BPF attached to cgroups for socket filtering | 4.10 | [`0e33661de493`](https://github.com/torvalds/linux/commit/0e33661de493db325435d565a4a722120ae4cbf3)                                  |
+| BPF support for `sock_ops`                   | 4.13 | [`40304b2a1567`](https://github.com/torvalds/linux/commit/40304b2a1567fecc321f640ee4239556dd0f3ee0)                                  |
+| BPF support for skbs on sockets              | 4.14 | [`b005fd189cec`](https://github.com/torvalds/linux/commit/b005fd189cec9407b700599e1e80e0552446ee79)                                  |
+| BPF used for monitoring socket RX/TX data    | 4.17 | [`4f738adba30a`](https://github.com/torvalds/linux/commit/4f738adba30a7cfc006f605707e7aee847ffefa0)                                  |
+| BPF socket reuseport                         | 4.19 | [`2dbb9b9e6df6`](https://github.com/torvalds/linux/commit/2dbb9b9e6df67d444fbe425c7f6014858d337adf)                                  |
+| BPF socket lookup hook                       | 5.9  | <p><a href="https://github.com/torvalds/linux/commit/e9ddbb7707ff5891616240026062b8c1e29864ca"><code>e9ddbb7707ff</code></a><br></p> |
+
+#### BPF attached to sockets
+
+3.19版本开始支持往socket上挂载BPF\_PROG\_TYPE\_SOCKET\_FILTER函数，通过
+
+```
+setsockopt(sock, SOL_SOCKET, SO_ATTACH_BPF, &prog_fd, sizeof(prog_fd))
+```
+
+挂载点是socket上的sk->sk\_filter，可以通过搜索这个关键词来搜索都在哪里调用这个钩子。
+
+Non-root programs on sockets
+
+允许非root socket函数
+
+```
+Only allow BPF_PROG_TYPE_SOCKET_FILTER unprivileged programs,
+so that socket filters (tcpdump), af_packet (quic acceleration)
+and future kcm can use it.
+```
+
+#### BPF attached to cgroups for socket filtering
+
+新增BPF\_PROG\_TYPE\_CGROUP\_SKB类型
+
+**和**BPF\_PROG\_TYPE\_SOCKET\_FILTER很相似，不同的地方在于CGROUP不支持BPF\_LD\_\[ABS|IND]指令，支持bpf\_skb\_load\_bytes() helper函数。
+
+cgroup相关的函数大部分挂载点都在对应的cgroup中的bpf.progs\[atype]链表上。
+
+```c
+cgrp->bpf.progs[atype]
+```
+
+这个链表上。同样的也可以通过搜索bpf.progs来看到都是哪里执行了挂载函数。
+
+```c
+int cgroup_bpf_prog_attach(const union bpf_attr *attr,
+
+```
+
+BPF support for `sock_ops`
+
+cgroup中所有的socket的某些option会触发这个函数，
+
+
+
+
+
+
 
 **可以挂载到套接字（socket）、控制组（cgroup ）以及网络命名空间（netns）等各个位置。**
 
