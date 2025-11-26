@@ -18,3 +18,5 @@
 * [使用ebpf工具排查网络问题](shi-yong-ebpf-gong-ju-pai-cha-wang-luo-wen-ti/README.md)
   * [问题及解决思路记录](shi-yong-ebpf-gong-ju-pai-cha-wang-luo-wen-ti/wen-ti-ji-jie-jue-si-lu-ji-lu.md)
 * [cilium](cilium.md)
+* [cilium ebpf package使用](cilium-ebpf-package-shi-yong.md)
+* [ebpf verify报错定位手段](ebpf-verify-bao-cuo-ding-wei-shou-duan.md)
